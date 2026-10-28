@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Non-Linear SVM Classification</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #eef2f7;
+            margin: 0;
+            padding: 30px 15px;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: auto;
+            background: white;
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+        }
+
+        h1 {
+            text-align: center;
+            color: #243b55;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 28px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #cbd2d9;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #2457a7;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            margin-top: 24px;
+            background: #2457a7;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #183d78;
+        }
+
+        .result {
+            margin-top: 22px;
+            padding: 16px;
+            text-align: center;
+            background: #e7f5e9;
+            color: #205b2b;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .error {
+            margin-top: 22px;
+            padding: 14px;
+            background: #ffe8e8;
+            color: #a00000;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .note {
+            margin-top: 24px;
+            color: #777;
+            font-size: 12px;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 520px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Non-Linear SVM</h1>
+
+        <p class="subtitle">
+            Breast Cancer Classification using the RBF Kernel
+        </p>
+
+        <form action="/predict" method="POST">
+            <div class="form-grid">
+                {% for feature in features %}
+                <div>
+                    <label for="{{ feature }}">
+                        {{ feature.title() }}
+                    </label>
+
+                    <input
+                        type="number"
+                        step="any"
+                        id="{{ feature }}"
+                        name="{{ feature }}"
+                        value="{{ request.form.get(feature, defaults[feature]) }}"
+                        required
+                    >
+                </div>
+                {% endfor %}
+            </div>
+
+            <button type="submit">Predict Result</button>
+        </form>
+
+        {% if prediction %}
+        <div class="result">
+            Predicted Class: {{ prediction.title() }}
+        </div>
+        {% endif %}
+
+        {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <p class="note">
+            Educational demonstration only. This model is not a medical
+            diagnostic tool.
+        </p>
+    </div>
+</body>
+</html>
