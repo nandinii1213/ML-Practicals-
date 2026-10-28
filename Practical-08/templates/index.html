@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Message Classification | Naive Bayes</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6f8;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 600px;
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            resize: vertical;
+            font-size: 16px;
+            outline: none;
+        }
+
+        textarea:focus {
+            border-color: #4a90e2;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 13px;
+            border: none;
+            border-radius: 8px;
+            background: #4a90e2;
+            color: white;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #357abd;
+        }
+
+        #result {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+        }
+
+        .important {
+            background: #e8f5e9;
+            border: 1px solid #4caf50;
+        }
+
+        .promotional {
+            background: #fff3e0;
+            border: 1px solid #ff9800;
+        }
+
+        .error {
+            background: #ffebee;
+            border: 1px solid #f44336;
+        }
+
+        .result-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .confidence {
+            font-size: 16px;
+            color: #555;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Message Classification</h1>
+
+        <p class="subtitle">
+            Naive Bayes Text Classification
+        </p>
+
+        <label for="message">
+            Enter your message:
+        </label>
+
+        <textarea
+            id="message"
+            placeholder="Example: Congratulations! You won a free smartphone. Claim it now."
+        ></textarea>
+
+        <button onclick="predictMessage()">
+            Predict Message
+        </button>
+
+        <div id="result"></div>
+
+    </div>
+
+
+    <script>
+
+        async function predictMessage() {
+
+            const message = document.getElementById("message").value.trim();
+
+            const resultBox = document.getElementById("result");
+
+            // Check empty message
+            if (message === "") {
+
+                resultBox.style.display = "block";
+                resultBox.className = "error";
+
+                resultBox.innerHTML = `
+                    <div class="result-title">
+                        Please enter a message.
+                    </div>
+                `;
+
+                return;
+            }
+
+            try {
+
+                const response = await fetch("/predict", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        message: message
+                    })
+
+                });
+
+
+                const data = await response.json();
+
+
+                if (!response.ok) {
+
+                    resultBox.style.display = "block";
+                    resultBox.className = "error";
+
+                    resultBox.innerHTML = `
+                        <div class="result-title">
+                            Error
+                        </div>
+
+                        <div>
+                            ${data.error}
+                        </div>
+                    `;
+
+                    return;
+                }
+
+
+                resultBox.style.display = "block";
+
+
+                if (data.prediction === "Promotional") {
+
+                    resultBox.className = "promotional";
+
+                    resultBox.innerHTML = `
+                        <div class="result-title">
+                            Promotional Message
+                        </div>
+
+                        <div class="confidence">
+                            Confidence: ${data.confidence}%
+                        </div>
+                    `;
+
+                } else {
+
+                    resultBox.className = "important";
+
+                    resultBox.innerHTML = `
+                        <div class="result-title">
+                            Important Message
+                        </div>
+
+                        <div class="confidence">
+                            Confidence: ${data.confidence}%
+                        </div>
+                    `;
+
+                }
+
+            } catch (error) {
+
+                resultBox.style.display = "block";
+                resultBox.className = "error";
+
+                resultBox.innerHTML = `
+                    <div class="result-title">
+                        Error
+                    </div>
+
+                    <div>
+                        Unable to connect to Flask server.
+                    </div>
+                `;
+            }
+        }
+
+    </script>
+
+</body>
+
+</html>
