@@ -1,0 +1,188 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Iris Flower Classification</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #eef2f7;
+            margin: 0;
+            padding: 30px 15px;
+        }
+
+        .container {
+            max-width: 750px;
+            margin: auto;
+            background: white;
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px #00000018;
+        }
+
+        h1 {
+            text-align: center;
+            color: #243b55;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 7px;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #cbd2d9;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 24px;
+            padding: 13px;
+            background: #2457a7;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #183d78;
+        }
+
+        .results {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .result-card {
+            background: #e8f4ff;
+            padding: 18px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .result-card h3 {
+            color: #243b55;
+            margin-top: 0;
+        }
+
+        .prediction {
+            font-size: 19px;
+            font-weight: bold;
+            color: #176534;
+        }
+
+        .error {
+            margin-top: 20px;
+            padding: 13px;
+            background: #ffe8e8;
+            color: #a00000;
+            border-radius: 6px;
+        }
+
+        .note {
+            text-align: center;
+            color: #777;
+            font-size: 12px;
+            margin-top: 25px;
+        }
+
+        @media (max-width: 520px) {
+            .form-grid, .results {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Iris Flower Classification</h1>
+
+        <p class="subtitle">
+            Decision Tree vs Random Forest
+        </p>
+
+        <form action="/predict" method="POST">
+            <div class="form-grid">
+                {% for feature in features %}
+                <div>
+                    <label for="{{ feature }}">
+                        {{ feature.replace('_', ' ').title() }}
+                        (cm)
+                    </label>
+
+                    <input
+                        type="number"
+                        step="any"
+                        id="{{ feature }}"
+                        name="{{ feature }}"
+                        value="{{ form_values[feature] if form_values else defaults[feature] }}"
+                        min="0"
+                        required
+                    >
+                </div>
+                {% endfor %}
+            </div>
+
+            <button type="submit">Predict Flower Species</button>
+        </form>
+
+        {% if dt_result and rf_result %}
+        <div class="results">
+            <div class="result-card">
+                <h3>Decision Tree</h3>
+                <div class="prediction">
+                    {{ dt_result.title() }}
+                </div>
+            </div>
+
+            <div class="result-card">
+                <h3>Random Forest</h3>
+                <div class="prediction">
+                    {{ rf_result.title() }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <p class="note">
+            Enter sepal length, sepal width, petal length,
+            and petal width in centimetres.
+        </p>
+    </div>
+</body>
+</html>
